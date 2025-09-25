@@ -144,12 +144,17 @@ const Components = () => {
                     <TableHead>Optimal Level</TableHead>
                     <TableHead>Stock %</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Supplier</TableHead>
+                    <TableHead>Unit Price</TableHead>
                     <TableHead>Last Updated</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {components.map((component) => (
+                {components.filter(component => {
+                  const matchesSearch = component.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                       component.sku.toLowerCase().includes(searchTerm.toLowerCase());
+                  const matchesCategory = filterCategory === "all" || component.category === filterCategory;
+                  return matchesSearch && matchesCategory;
+                }).map((component) => (
                     <TableRow key={component.id}>
                       <TableCell className="font-medium">{component.id}</TableCell>
                       <TableCell>{component.name}</TableCell>

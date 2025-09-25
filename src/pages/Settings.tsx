@@ -8,11 +8,18 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { useTheme } from "@/components/ThemeProvider";
 
 const SettingsPage = () => {
-  const [darkMode, setDarkMode] = useState(false);
+  const { theme, toggleTheme } = useTheme();
+  const [profile, setProfile] = useState({
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john.doe@company.com',
+    department: 'Supply Chain Management'
+  });
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
   const [criticalAlerts, setCriticalAlerts] = useState(true);
@@ -20,13 +27,49 @@ const SettingsPage = () => {
   const [autoReorder, setAutoReorder] = useState(false);
   const [language, setLanguage] = useState("english");
   const [timezone, setTimezone] = useState("utc");
+  const [currency, setCurrency] = useState("usd");
+
+  // Load settings from localStorage on component mount
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('userSettings');
+    if (savedSettings) {
+      const settings = JSON.parse(savedSettings);
+      setProfile(prev => ({ ...prev, ...settings.profile }));
+      setEmailNotifications(settings.emailNotifications ?? true);
+      setPushNotifications(settings.pushNotifications ?? true);
+      setCriticalAlerts(settings.criticalAlerts ?? true);
+      setAiInsights(settings.aiInsights ?? true);
+      setAutoReorder(settings.autoReorder ?? false);
+      setLanguage(settings.language ?? "english");
+      setTimezone(settings.timezone ?? "utc");
+      setCurrency(settings.currency ?? "usd");
+    }
+  }, []);
   
   const handleSave = () => {
+    const settings = {
+      profile,
+      emailNotifications,
+      pushNotifications,
+      criticalAlerts,
+      aiInsights,
+      autoReorder,
+      language,
+      timezone,
+      currency
+    };
+    localStorage.setItem('userSettings', JSON.stringify(settings));
     toast.success("Settings saved successfully!");
   };
 
   const handleReset = () => {
-    setDarkMode(false);
+    const defaultProfile = {
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john.doe@company.com',
+      department: 'Supply Chain Management'
+    };
+    setProfile(defaultProfile);
     setEmailNotifications(true);
     setPushNotifications(true);
     setCriticalAlerts(true);
@@ -34,7 +77,13 @@ const SettingsPage = () => {
     setAutoReorder(false);
     setLanguage("english");
     setTimezone("utc");
+    setCurrency("usd");
+    localStorage.removeItem('userSettings');
     toast.success("Settings reset to defaults!");
+  };
+
+  const handleProfileChange = (field: string, value: string) => {
+    setProfile(prev => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -75,16 +124,29 @@ const SettingsPage = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="firstName">First Name</Label>
-                      <Input id="firstName" defaultValue="John" />
+                      <Input 
+                        id="firstName" 
+                        value={profile.firstName}
+                        onChange={(e) => handleProfileChange('firstName', e.target.value)}
+                      />
                     </div>
                     <div>
                       <Label htmlFor="lastName">Last Name</Label>
-                      <Input id="lastName" defaultValue="Doe" />
+                      <Input 
+                        id="lastName" 
+                        value={profile.lastName}
+                        onChange={(e) => handleProfileChange('lastName', e.target.value)}
+                      />
                     </div>
                   </div>
                   <div>
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" defaultValue="john.doe@company.com" />
+                    <Input 
+                      id="email" 
+                      type="email" 
+                      value={profile.email}
+                      onChange={(e) => handleProfileChange('email', e.target.value)}
+                    />
                   </div>
                   <div>
                     <Label htmlFor="role">Role</Label>
@@ -92,7 +154,11 @@ const SettingsPage = () => {
                   </div>
                   <div>
                     <Label htmlFor="department">Department</Label>
-                    <Input id="department" defaultValue="Supply Chain Management" />
+                    <Input 
+                      id="department" 
+                      value={profile.department}
+                      onChange={(e) => handleProfileChange('department', e.target.value)}
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -171,14 +237,14 @@ const SettingsPage = () => {
                     <div className="flex items-center gap-2">
                       <Sun className="h-4 w-4" />
                       <Switch 
-                        checked={darkMode} 
-                        onCheckedChange={setDarkMode}
+                        checked={theme === 'dark'} 
+                        onCheckedChange={toggleTheme}
                       />
                       <Moon className="h-4 w-4" />
                     </div>
                   </div>
                   <Separator />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="language">Language</Label>
                       <Select value={language} onValueChange={setLanguage}>
@@ -204,6 +270,24 @@ const SettingsPage = () => {
                           <SelectItem value="est">Eastern (EST)</SelectItem>
                           <SelectItem value="pst">Pacific (PST)</SelectItem>
                           <SelectItem value="cet">Central European (CET)</SelectItem>
+                          <SelectItem value="ist">India Standard Time (IST)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="currency">Currency</Label>
+                      <Select value={currency} onValueChange={setCurrency}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="usd">USD ($)</SelectItem>
+                          <SelectItem value="eur">EUR (€)</SelectItem>
+                          <SelectItem value="gbp">GBP (£)</SelectItem>
+                          <SelectItem value="jpy">JPY (¥)</SelectItem>
+                          <SelectItem value="inr">INR (₹)</SelectItem>
+                          <SelectItem value="cad">CAD (C$)</SelectItem>
+                          <SelectItem value="aud">AUD (A$)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

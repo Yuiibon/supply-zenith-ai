@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 
 const Suppliers = () => {
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const suppliers = [
     {
       id: "SUP001",
@@ -314,6 +315,11 @@ const Suppliers = () => {
               </CardContent>
             </Card>
           </div>
+          
+          <AddSupplierModal 
+            isOpen={isAddModalOpen} 
+            onClose={() => setIsAddModalOpen(false)} 
+          />
         </main>
       </div>
     </div>
