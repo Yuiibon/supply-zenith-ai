@@ -1,12 +1,19 @@
 import Sidebar from "@/components/Dashboard/Sidebar";
-import { Package, Search, Filter, AlertTriangle, CheckCircle, Clock } from "lucide-react";
+import { Package, Search, Filter, AlertTriangle, CheckCircle, Clock, Plus, Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
+import AddComponentModal from "@/components/AddComponentModal";
+import { toast } from "sonner";
 
 const Components = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterCategory, setFilterCategory] = useState("all");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const components = [
     {
       id: "R001",
@@ -151,7 +158,7 @@ const Components = () => {
                 <TableBody>
                 {components.filter(component => {
                   const matchesSearch = component.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                       component.sku.toLowerCase().includes(searchTerm.toLowerCase());
+                                       component.id.toLowerCase().includes(searchTerm.toLowerCase());
                   const matchesCategory = filterCategory === "all" || component.category === filterCategory;
                   return matchesSearch && matchesCategory;
                 }).map((component) => (
@@ -220,17 +227,22 @@ const Components = () => {
             </Card>
             <Card>
               <CardContent className="p-6">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-500">1</div>
-                  <div className="text-sm text-muted-foreground">Overstocked</div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </main>
-      </div>
-    </div>
-  );
-};
+                 <div className="text-center">
+                   <div className="text-2xl font-bold text-blue-500">1</div>
+                   <div className="text-sm text-muted-foreground">Overstocked</div>
+                 </div>
+               </CardContent>
+             </Card>
+           </div>
+           
+           <AddComponentModal 
+             isOpen={isAddModalOpen} 
+             onClose={() => setIsAddModalOpen(false)} 
+           />
+         </main>
+       </div>
+     </div>
+   );
+ };
 
 export default Components;

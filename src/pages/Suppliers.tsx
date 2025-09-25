@@ -1,10 +1,12 @@
 import Sidebar from "@/components/Dashboard/Sidebar";
-import { Truck, Star, Clock, DollarSign, Package, Phone, Mail, MapPin } from "lucide-react";
+import { Truck, Star, Clock, DollarSign, Package, Phone, Mail, MapPin, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { useState } from "react";
+import AddSupplierModal from "@/components/AddSupplierModal";
 
 const Suppliers = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
